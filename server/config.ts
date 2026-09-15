@@ -1,3 +1,14 @@
+import { AsyncLocalStorage } from 'async_hooks';
+import type { Servidor } from './servidores.js';
+
+/** Servidor da bmAPI da requisição atual (definido por comServidor em bmapi.ts) */
+export const contextoServidor = new AsyncLocalStorage<Servidor>();
+
+/** Regra de negócio: primeiro servidores.config do servidor da sessão, depois o .env */
+function valor(chave: string): string | undefined {
+  return contextoServidor.getStore()?.config[chave] ?? process.env[chave];
+}
+
 /**
  * Configuração do EstoqueWEB, lida do .env.
  * Equivale ao estoqueWeb.ini do app Delphi, mais os dados de acesso à bmAPI.
@@ -28,12 +39,13 @@ export const config = {
 
   sessionSecret: process.env.SESSION_SECRET || '',
 
-  idEmpresa: inteiro(process.env.ID_EMPRESA, 1),
-  consistirFinanceiro: simNao(process.env.CONSISTIR_FINANCEIRO, true),
-  diasEmAtraso: inteiro(process.env.DIAS_EM_ATRASO, 3),
-  consistirBloqueio: simNao(process.env.CONSISTIR_BLOQUEIO, false),
-  apresentarEstoque: simNao(process.env.APRESENTAR_ESTOQUE, true),
-  apresentarSimilares: simNao(process.env.APRESENTAR_SIMILARES, true),
+  // Por cliente: vêm de servidores.config (KEY=VALOR por linha); sem a chave, do .env
+  get idEmpresa() { return inteiro(valor('ID_EMPRESA'), 1); },
+  get consistirFinanceiro() { return simNao(valor('CONSISTIR_FINANCEIRO'), true); },
+  get diasEmAtraso() { return inteiro(valor('DIAS_EM_ATRASO'), 3); },
+  get consistirBloqueio() { return simNao(valor('CONSISTIR_BLOQUEIO'), false); },
+  get apresentarEstoque() { return simNao(valor('APRESENTAR_ESTOQUE'), true); },
+  get apresentarSimilares() { return simNao(valor('APRESENTAR_SIMILARES'), true); },
 
   agendadorMeiaNoite: simNao(process.env.AGENDADOR_MEIA_NOITE, false),
   /** Número do servidor (tabela servidores) em que a rotina da meia-noite roda */

@@ -1,6 +1,5 @@
 import crypto from 'crypto';
-import { AsyncLocalStorage } from 'async_hooks';
-import { config } from './config.js';
+import { config, contextoServidor as contexto } from './config.js';
 import { Servidor } from './servidores.js';
 
 /**
@@ -43,7 +42,6 @@ const TIMEOUT_MS = 120_000;
  * servidor da tabela servidores) e fixado pela sessão em exigirSessao; todas as
  * funções abaixo usam o servidor do contexto.
  */
-const contexto = new AsyncLocalStorage<Servidor>();
 
 export function comServidor<T>(servidor: Servidor, fn: () => T): T {
   return contexto.run(servidor, fn);

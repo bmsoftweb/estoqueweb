@@ -14,6 +14,19 @@ export interface Servidor {
   /** URL base já com protocolo e porta, ex.: http://localhost:9000 */
   baseUrl: string;
   token: string;
+  /** Regras por cliente de servidores.config (chaves em maiúsculas) */
+  config: Record<string, string>;
+}
+
+/** Texto "CHAVE=VALOR" por linha; linhas vazias ou com # são ignoradas */
+export function lerConfig(texto: string | null): Record<string, string> {
+  const cfg: Record<string, string> = {};
+  for (const linha of String(texto || '').split(/\r?\n/)) {
+    const i = linha.indexOf('=');
+    if (i < 1 || linha.trim().startsWith('#')) continue;
+    cfg[linha.slice(0, i).trim().toUpperCase()] = linha.slice(i + 1).trim();
+  }
+  return cfg;
 }
 
 const pool = mysql.createPool({
@@ -52,7 +65,7 @@ export async function buscarServidor(numero: number): Promise<Servidor | null> {
   if (emCache && emCache.ate > Date.now()) return emCache.servidor;
 
   const [rows] = await pool.query<any[]>(
-    'SELECT id, url, port, token, identificacao FROM servidores WHERE id = ? LIMIT 1',
+    'SELECT id, url, port, token, identificacao, config FROM servidores WHERE id = ? LIMIT 1',
     [numero],
   );
   const r = rows[0];
@@ -63,6 +76,7 @@ export async function buscarServidor(numero: number): Promise<Servidor | null> {
           identificacao: String(r.identificacao || `Servidor ${r.id}`).trim(),
           baseUrl: montarBaseUrl(r.url, r.port),
           token: String(r.token).trim(),
+          config: lerConfig(r.config),
         }
       : null;
 
