@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { config } from './config';
+import { config } from './config.js';
 import {
   consultar,
   consultarUm,
@@ -15,16 +15,16 @@ import {
   comServidor,
   BmapiError,
   Linha,
-} from './bmapi';
-import { buscarServidor } from './servidores';
-import { exigirNivel, nivelGerente, UsuarioSessao } from './auth';
+} from './bmapi.js';
+import { buscarServidor } from './servidores.js';
+import { exigirNivel, nivelGerente, UsuarioSessao } from './auth.js';
 import {
   ajustarReserva,
   buscarReferencia,
   disponivelReferencia,
   precoUnitario,
   sqlAjusteReserva,
-} from './estoqueComum';
+} from './estoqueComum.js';
 
 /**
  * Pedidos web das lojas (frmPedidos).

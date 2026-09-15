@@ -1,8 +1,8 @@
 import crypto from 'crypto';
 import { Router, Request, Response, NextFunction } from 'express';
-import { config } from './config';
-import { consultarUm, executar, comServidor, servidorAtual, verificarBmapi, BmapiError } from './bmapi';
-import { buscarServidor, Servidor } from './servidores';
+import { config } from './config.js';
+import { consultarUm, executar, comServidor, servidorAtual, verificarBmapi, BmapiError } from './bmapi.js';
+import { buscarServidor, Servidor } from './servidores.js';
 
 /**
  * Autenticação do EstoqueWEB.

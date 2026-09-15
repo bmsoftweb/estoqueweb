@@ -1,4 +1,4 @@
-import { config } from './config';
+import { config } from './config.js';
 import {
   consultar,
   consultarUm,
@@ -8,8 +8,8 @@ import {
   tabelaMemoria,
   servidorAtual,
   BmapiError,
-} from './bmapi';
-import { UsuarioSessao } from './auth';
+} from './bmapi.js';
+import { UsuarioSessao } from './auth.js';
 
 /**
  * Regras de estoque compartilhadas pela pesquisa e pelos pedidos.

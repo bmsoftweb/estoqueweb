@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
-import { config } from './config';
+import { config } from './config.js';
 import {
   consultar,
   consultarComLimite,
@@ -13,14 +13,14 @@ import {
   tabelaMemoria,
   baixarBlob,
   BmapiError,
-} from './bmapi';
-import { exigirNivel, nivelAdministrador, nivelSupervisor, UsuarioSessao } from './auth';
+} from './bmapi.js';
+import { exigirNivel, nivelAdministrador, nivelSupervisor, UsuarioSessao } from './auth.js';
 import {
   ajustarReserva,
   baseTemInfoComplementar,
   disponivelReferencia,
   recalcularReservas,
-} from './estoqueComum';
+} from './estoqueComum.js';
 
 /** Máximo de linhas da pesquisa (a bmAPI também corta em maxRows) */
 const LIMITE_PESQUISA = 500;

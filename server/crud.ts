@@ -1,8 +1,8 @@
 import { Router, Request, Response } from 'express';
-import { config } from './config';
-import { consultar, consultarUm, executar, BmapiError } from './bmapi';
-import { invalidarCacheUsuario, nivelAdministrador, nivelGerente, UsuarioSessao } from './auth';
-import { RESOURCES, FieldDef, ResourceDef, getResource, fieldExpr, writableFields } from './schema';
+import { config } from './config.js';
+import { consultar, consultarUm, executar, BmapiError } from './bmapi.js';
+import { invalidarCacheUsuario, nivelAdministrador, nivelGerente, UsuarioSessao } from './auth.js';
+import { RESOURCES, FieldDef, ResourceDef, getResource, fieldExpr, writableFields } from './schema.js';
 
 /**
  * CRUD genérico dirigido pelo registro de metadados (server/schema.ts), no mesmo

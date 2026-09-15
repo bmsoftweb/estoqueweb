@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { AsyncLocalStorage } from 'async_hooks';
-import { config } from './config';
-import { Servidor } from './servidores';
+import { config } from './config.js';
+import { Servidor } from './servidores.js';
 
 /**
  * Cliente da bmAPI (D:\bmsoft\BMapi), o único caminho até a base DBISAM.

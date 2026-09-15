@@ -112,3 +112,11 @@ GIF, BMP). Cada servidor precisa estar com o `BMapi.exe` atualizado para as foto
 
 Na pesquisa de estoque, produtos com foto mostram um ícone de câmera ao lado da descrição; o
 clique abre as fotos do produto (setas ou teclado para navegar).
+
+## Deploy na Vercel
+
+- `api/index.ts` exporta o app Express (`server/app.ts`) como função serverless; o `vercel.json` manda todo `/api/*` para ela. O front é o build do Vite (`dist`).
+- Variáveis de ambiente (Settings → Environment Variables): `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE`, `SESSION_SECRET`, e as regras de negócio do `.env.example` (`ID_EMPRESA`, `CONSISTIR_FINANCEIRO`, `CONSISTIR_BLOQUEIO`...).
+- Na tabela `servidores`, a `url` precisa ser pública (IP/domínio acessível da internet); `localhost` só funciona rodando local.
+- O MySQL precisa aceitar conexões externas (a Vercel não tem IP fixo).
+- A rotina da meia-noite (`AGENDADOR_MEIA_NOITE`) não roda na Vercel; só no servidor local (`npm run dev`/`npm start`).
