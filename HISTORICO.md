@@ -2,6 +2,10 @@
 
 Mais recente primeiro. PATCH a cada envio ao GitHub; MAJOR/MINOR só quando pedido.
 
+## 0.0.3 — 2026-10-05
+
+- Teste: Cron da rotina da meia-noite movido para 15:00 UTC (12:00 de Brasília). Voltar para `0 3 * * *` depois do teste.
+
 ## 0.0.2 — 2026-10-05
 
 - Login: ao digitar o número do servidor aparece só "On-line" ou "Off-line"; a rota pública `/api/servidores/:numero` não devolve mais o nome do servidor nem o erro técnico.
