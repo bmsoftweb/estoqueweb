@@ -46,11 +46,15 @@ export const config = {
   get consistirBloqueio() { return simNao(valor('CONSISTIR_BLOQUEIO'), false); },
   get apresentarEstoque() { return simNao(valor('APRESENTAR_ESTOQUE'), true); },
   get apresentarSimilares() { return simNao(valor('APRESENTAR_SIMILARES'), true); },
+  /** Plano usado pela rotina da meia-noite quando o pedido não tem plano */
+  get planoPadraoAgendador() { return inteiro(valor('PLANO_PADRAO_AGENDADOR'), 7); },
 
   agendadorMeiaNoite: simNao(process.env.AGENDADOR_MEIA_NOITE, false),
-  /** Número do servidor (tabela servidores) em que a rotina da meia-noite roda */
-  agendadorServidor: inteiro(process.env.AGENDADOR_SERVIDOR, 0),
-  planoPadraoAgendador: inteiro(process.env.PLANO_PADRAO_AGENDADOR, 7),
+  /** Números dos servidores (tabela servidores) em que a rotina da meia-noite roda, ex.: "1,3" */
+  agendadorServidores: String(process.env.AGENDADOR_SERVIDOR || '')
+    .split(',')
+    .map((s) => inteiro(s, 0))
+    .filter((n) => n > 0),
 };
 
 /** Configurações que o frontend precisa conhecer (sem nada sensível) */

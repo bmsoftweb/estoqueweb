@@ -211,7 +211,8 @@ async function totalizar(idPedido: number) {
   const pedido = await consultarUm('SELECT STATUS status, ID_PLANO id_plano FROM WEB_PEDIDOS WHERE ID = :id', {
     id: idPedido,
   });
-  if (!pedido || String(pedido.status).trim() !== STATUS_ABERTO) return;
+  // Status vazio conta como aberto (igual a mapearPedido)
+  if (!pedido || (String(pedido.status ?? '').trim() || STATUS_ABERTO) !== STATUS_ABERTO) return;
 
   const soma = await consultarUm('SELECT SUM(PRECO_TOTAL) total FROM WEB_PEDIDOS_PRO WHERE ID_PEDIDO = :id', {
     id: idPedido,
@@ -289,16 +290,22 @@ export async function fecharPedido(idPedido: number, opcoes: OpcoesFechamento) {
   }
   exigirAberto(pedido);
 
+  // Sem plano, a rotina da meia-noite usa o plano padrão e grava no pedido para o desconto dele entrar no recálculo
+  if (opcoes.automatico && !pedido.idPlano) {
+    await executar('UPDATE WEB_PEDIDOS SET ID_PLANO = :p WHERE ID = :id', {
+      p: config.planoPadraoAgendador,
+      id: idPedido,
+    });
+  }
+
   await totalizar(idPedido);
   pedido = mapearPedido((await consultarUm(`${SELECT_PEDIDO} WHERE W.ID = :id`, { id: idPedido }))!);
   const itens = await carregarItens(idPedido);
 
   if (!itens.length) throw new BmapiError('O pedido não tem itens.');
 
-  let idPlano = pedido.idPlano;
-  if (opcoes.automatico) {
-    if (!idPlano) idPlano = config.planoPadraoAgendador;
-  } else {
+  const idPlano = pedido.idPlano;
+  if (!opcoes.automatico) {
     // Limite de crédito da loja
     const credito = await consultarUm(
       `SELECT SUM(COALESCE(A.VALOR,0) - COALESCE(A.VALOR_RECEBIDO,0)) valor_aberto
@@ -337,9 +344,6 @@ export async function fecharPedido(idPedido: number, opcoes: OpcoesFechamento) {
   const numero = await proximoNumeroDav(idEmpresa);
   const refVendedor = pedidoVendedor(idPedido);
 
-  const totalBruto = opcoes.automatico ? pedido.totalPedido : pedido.totalProdutos;
-  const descontos = opcoes.automatico ? 0 : pedido.totalDescontos;
-
   // 1. Cabeçalho do DAV
   const orcamento = await consultarUm(`
     SELECT ID FROM ORCAMENTOM WHERE ID = -1;
@@ -348,8 +352,8 @@ export async function fecharPedido(idPedido: number, opcoes: OpcoesFechamento) {
                             OBS, OBS_INT, TIPO, TPACRE, TPDESC, PEDIDO_VENDEDOR, CONTATO, IMPORTMP, VALIDADO, ID_MP)
     VALUES (${sqlInteiro(idEmpresa)}, ${sqlInteiro(numero)}, CURRENT_DATE, CURRENT_DATE, CURRENT_TIME,
             ${sqlInteiro(pedido.idCliente)}, ${sqlTexto(cliente?.nome ?? '', 40)}, ${sqlTexto(cliente?.cpfcnpj ?? '', 20)},
-            ${sqlInteiro(idPlano)}, 1, ${sqlNumero(pedido.totalProdutos)}, 0, ${sqlNumero(totalBruto)},
-            ${sqlNumero(descontos)}, ${sqlNumero(pedido.totalPedido)},
+            ${sqlInteiro(idPlano)}, 1, ${sqlNumero(pedido.totalProdutos)}, 0, ${sqlNumero(pedido.totalProdutos)},
+            ${sqlNumero(pedido.totalDescontos)}, ${sqlNumero(pedido.totalPedido)},
             ${sqlTexto(pedido.obs)}, ${opcoes.automatico ? sqlTexto('PEDIDO FECHADO PELO SISTEMA') : 'NULL'},
             'P', 'V', 'V', ${sqlTexto(refVendedor)}, '', ${sqlBool(true)}, ${sqlBool(true)}, 0);
     SELECT ID id FROM ORCAMENTOM
@@ -915,8 +919,11 @@ export function createPedidosRouter() {
 async function rotinaMeiaNoite() {
   console.log('[agendador] Fechando pedidos abertos e desfazendo pré-reservas…');
 
+  // Mesmo filtro do tbPedidos do backend Delphi: tudo que não é F nem X (status vazio conta como aberto)
   const abertos = await consultar(
-    `SELECT W.ID id FROM WEB_PEDIDOS W WHERE W.STATUS = '${STATUS_ABERTO}' AND W.ID_EMPRESA > 0 ORDER BY W.ID`,
+    `SELECT W.ID id FROM WEB_PEDIDOS W
+      WHERE COALESCE(W.STATUS,'') <> '${STATUS_FECHADO}' AND COALESCE(W.STATUS,'') <> '${STATUS_CANCELADO}'
+        AND W.ID_EMPRESA > 0 ORDER BY W.ID`,
   );
   for (const p of abertos) {
     try {
@@ -941,9 +948,29 @@ async function rotinaMeiaNoite() {
   console.log('[agendador] Concluído.');
 }
 
+/**
+ * Roda a rotina em cada servidor de AGENDADOR_SERVIDOR (ex.: "1" ou "1,3"); a falha
+ * de um não impede os outros. Chamada pelo timer local e pelo Cron da Vercel.
+ */
+export async function executarRotinaMeiaNoite() {
+  const resultado: Record<number, string> = {};
+  for (const numero of config.agendadorServidores) {
+    try {
+      const servidor = await buscarServidor(numero);
+      if (!servidor) throw new Error(`servidor ${numero} não encontrado no cadastro`);
+      await comServidor(servidor, () => rotinaMeiaNoite());
+      resultado[numero] = 'ok';
+    } catch (err: any) {
+      console.error(`[agendador] Erro no servidor ${numero}:`, err.message);
+      resultado[numero] = err.message;
+    }
+  }
+  return resultado;
+}
+
 export function iniciarAgendador() {
   if (!config.agendadorMeiaNoite) return;
-  if (!config.agendadorServidor) {
+  if (!config.agendadorServidores.length) {
     console.warn('[agendador] AGENDADOR_SERVIDOR não informado: rotina da meia-noite desativada.');
     return;
   }
@@ -953,17 +980,11 @@ export function iniciarAgendador() {
     const proxima = new Date(agora);
     proxima.setHours(24, 0, 5, 0);
     setTimeout(async () => {
-      try {
-        const servidor = await buscarServidor(config.agendadorServidor);
-        if (!servidor) throw new Error(`servidor ${config.agendadorServidor} não encontrado no cadastro`);
-        await comServidor(servidor, () => rotinaMeiaNoite());
-      } catch (err: any) {
-        console.error('[agendador] Erro:', err.message);
-      }
+      await executarRotinaMeiaNoite();
       agendar();
     }, proxima.getTime() - agora.getTime());
   };
 
   agendar();
-  console.log(`[agendador] Rotina da meia-noite ativada no servidor ${config.agendadorServidor}.`);
+  console.log(`[agendador] Rotina da meia-noite ativada nos servidores ${config.agendadorServidores.join(', ')}.`);
 }

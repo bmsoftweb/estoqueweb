@@ -4,7 +4,7 @@ import { config, configPublica } from './config.js';
 import { consultar, consultarUm, verificarBmapi, sqlInteiro } from './bmapi.js';
 import { createAuthRouter, exigirSessao, nivelGerente } from './auth.js';
 import { createEstoqueRouter } from './estoque.js';
-import { createPedidosRouter } from './pedidos.js';
+import { createPedidosRouter, executarRotinaMeiaNoite } from './pedidos.js';
 import { createCrudRouter } from './crud.js';
 
 /**
@@ -20,6 +20,19 @@ export function createApp() {
   // 0. Autenticação (login é público; o resto exige sessão)
   // ==========================================================
   app.use('/api', createAuthRouter());
+
+  // Cron da Vercel (vercel.json): rotina da meia-noite do estoqueWeb_backend.exe.
+  // Fora da sessão; a Vercel autentica com "Authorization: Bearer <CRON_SECRET>".
+  app.get('/api/cron/meia-noite', async (req: Request, res: Response) => {
+    const segredo = process.env.CRON_SECRET;
+    if (!segredo || req.header('authorization') !== `Bearer ${segredo}`) {
+      return res.status(401).json({ error: 'Não autorizado.' });
+    }
+    if (!config.agendadorMeiaNoite || !config.agendadorServidores.length) {
+      return res.json({ executado: false, motivo: 'AGENDADOR_MEIA_NOITE ou AGENDADOR_SERVIDOR não configurado.' });
+    }
+    res.json({ executado: true, servidores: await executarRotinaMeiaNoite() });
+  });
 
   app.use('/api', exigirSessao);
 

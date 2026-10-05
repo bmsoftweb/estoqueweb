@@ -120,4 +120,4 @@ clique abre as fotos do produto (setas ou teclado para navegar).
 - Regras de negócio por cliente ficam em `servidores.config` (uma `CHAVE=VALOR` por linha: `ID_EMPRESA`, `CONSISTIR_FINANCEIRO`, `DIAS_EM_ATRASO`, `CONSISTIR_BLOQUEIO`, `APRESENTAR_ESTOQUE`, `APRESENTAR_SIMILARES`). Chave ausente cai no `.env`/variável de ambiente. Alterações valem em até 1 minuto (cache).
 - Na tabela `servidores`, a `url` precisa ser pública (IP/domínio acessível da internet); `localhost` só funciona rodando local.
 - O MySQL precisa aceitar conexões externas (a Vercel não tem IP fixo).
-- A rotina da meia-noite (`AGENDADOR_MEIA_NOITE`) não roda na Vercel; só no servidor local (`npm run dev`/`npm start`).
+- A rotina da meia-noite (`AGENDADOR_MEIA_NOITE=S`) roda na Vercel pelo Cron do `vercel.json` (`/api/cron/meia-noite`, 03:00 UTC = 00:00 de Brasília), exigindo `CRON_SECRET` e `AGENDADOR_SERVIDOR` nas variáveis do projeto. Localmente roda pelo timer do `npm run dev`/`npm start`; não ligue nos dois lugares.
