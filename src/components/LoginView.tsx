@@ -25,7 +25,7 @@ interface LoginViewProps {
 type EstadoServidor =
   | { tipo: 'vazio' }
   | { tipo: 'consultando' }
-  | { tipo: 'ok'; identificacao: string; connected: boolean; error?: string }
+  | { tipo: 'ok'; connected: boolean }
   | { tipo: 'erro'; mensagem: string };
 
 export const LoginView: React.FC<LoginViewProps> = ({ avisoInicial, theme = 'light', onToggleTheme, onLoginSuccess }) => {
@@ -42,7 +42,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ avisoInicial, theme = 'lig
   const numeroServidor = Number(servidor);
   const servidorValido = Number.isInteger(numeroServidor) && numeroServidor >= 1 && numeroServidor <= 999;
 
-  // Mostra a identificação do servidor enquanto o número é digitado
+  // Mostra se o servidor está on-line enquanto o número é digitado
   useEffect(() => {
     if (!servidorValido) {
       setEstadoServidor({ tipo: 'vazio' });
@@ -52,7 +52,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ avisoInicial, theme = 'lig
     setEstadoServidor({ tipo: 'consultando' });
     const t = setTimeout(() => {
       consultarServidor(numeroServidor)
-        .then((s) => vivo && setEstadoServidor({ tipo: 'ok', identificacao: s.identificacao, connected: s.connected, error: s.error }))
+        .then((s) => vivo && setEstadoServidor({ tipo: 'ok', connected: s.connected }))
         .catch((e) => vivo && setEstadoServidor({ tipo: 'erro', mensagem: e.message }));
     }, 400);
     return () => {
@@ -156,11 +156,9 @@ export const LoginView: React.FC<LoginViewProps> = ({ avisoInicial, theme = 'lig
                     className={`inline-flex items-center gap-1.5 ${
                       estadoServidor.connected ? 'text-emerald-700 dark:text-emerald-400' : 'text-amber-700 dark:text-amber-400'
                     }`}
-                    title={estadoServidor.error}
                   >
                     {estadoServidor.connected ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
-                    <strong>{estadoServidor.identificacao}</strong>
-                    {!estadoServidor.connected && ' • base indisponível no momento'}
+                    <strong>{estadoServidor.connected ? 'On-line' : 'Off-line'}</strong>
                   </span>
                 )}
               </div>

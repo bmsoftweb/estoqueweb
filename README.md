@@ -117,7 +117,7 @@ clique abre as fotos do produto (setas ou teclado para navegar).
 
 - `api/index.ts` exporta o app Express (`server/app.ts`) como função serverless; o `vercel.json` manda todo `/api/*` para ela. O front é o build do Vite (`dist`).
 - Variáveis de ambiente (Settings → Environment Variables): `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE`, `SESSION_SECRET`.
-- Regras de negócio por cliente ficam em `servidores.config` (uma `CHAVE=VALOR` por linha: `ID_EMPRESA`, `CONSISTIR_FINANCEIRO`, `DIAS_EM_ATRASO`, `CONSISTIR_BLOQUEIO`, `APRESENTAR_ESTOQUE`, `APRESENTAR_SIMILARES`). Chave ausente cai no `.env`/variável de ambiente. Alterações valem em até 1 minuto (cache).
+- Regras de negócio por cliente ficam em `servidores.config` (uma `CHAVE=VALOR` por linha: `ID_EMPRESA`, `CONSISTIR_FINANCEIRO`, `DIAS_EM_ATRASO`, `CONSISTIR_BLOQUEIO`, `APRESENTAR_ESTOQUE`, `APRESENTAR_SIMILARES`, `PLANO_PADRAO_AGENDADOR`). Não são mais cadastradas no `.env` nem na Vercel; chave ausente usa o padrão do código (ver `.env.example`). Alterações valem em até 1 minuto (cache).
 - Na tabela `servidores`, a `url` precisa ser pública (IP/domínio acessível da internet); `localhost` só funciona rodando local.
 - O MySQL precisa aceitar conexões externas (a Vercel não tem IP fixo).
 - A rotina da meia-noite (`AGENDADOR_MEIA_NOITE=S`) roda na Vercel pelo Cron do `vercel.json` (`/api/cron/meia-noite`, 03:00 UTC = 00:00 de Brasília), exigindo `CRON_SECRET` e `AGENDADOR_SERVIDOR` nas variáveis do projeto. Localmente roda pelo timer do `npm run dev`/`npm start`; não ligue nos dois lugares.

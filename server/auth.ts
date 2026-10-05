@@ -238,14 +238,14 @@ export function createAuthRouter() {
   const router = Router();
 
   /**
-   * Identificação do servidor digitado no login (público): nome e se a bmAPI
-   * responde. URL, porta e token não saem do servidor.
+   * Situação do servidor digitado no login (público): só se a bmAPI responde.
+   * Nome, URL, porta e token não saem do servidor.
    */
   router.get('/servidores/:numero', async (req: Request, res: Response) => {
     try {
       const servidor = await resolverServidor(numeroServidor(req.params.numero));
       const status = await comServidor(servidor, () => verificarBmapi());
-      res.json({ ...dadosPublicosServidor(servidor), connected: status.connected, error: status.error });
+      res.json({ numero: servidor.numero, connected: status.connected });
     } catch (err: any) {
       res.status(err?.status || 500).json({ error: err.message });
     }

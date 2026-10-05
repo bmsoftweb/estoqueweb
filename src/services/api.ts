@@ -87,10 +87,8 @@ export async function login(
   return data;
 }
 
-/** Identificação do servidor digitado no login e se a bmAPI dele responde */
-export async function consultarServidor(
-  numero: number,
-): Promise<ServidorInfo & { connected: boolean; error?: string }> {
+/** Se a bmAPI do servidor digitado no login responde */
+export async function consultarServidor(numero: number): Promise<{ numero: number; connected: boolean }> {
   const res = await fetch(`/api/servidores/${numero}`);
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data?.error || 'Servidor não encontrado.');
