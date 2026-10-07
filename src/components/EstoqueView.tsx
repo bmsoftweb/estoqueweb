@@ -162,7 +162,6 @@ export const EstoqueView: React.FC<EstoqueViewProps> = ({ usuario, config, ativo
   }, [produtos, ordem]);
 
   const temInfo = useMemo(() => Boolean(produtos?.some((p) => p.info)), [produtos]);
-  const temAplicacao = useMemo(() => Boolean(produtos?.some((p) => p.aplicacao)), [produtos]);
 
   const ordenar = (campo: ColunaOrdenavel) =>
     setOrdem((o) => (o?.campo === campo ? { campo, dir: o.dir === 'asc' ? 'desc' : 'asc' } : { campo, dir: 'asc' }));
@@ -354,7 +353,6 @@ export const EstoqueView: React.FC<EstoqueViewProps> = ({ usuario, config, ativo
                 {cabecalho('Classe', 'classe')}
                 {cabecalho('Código', 'id', 'right')}
                 {cabecalho('Descrição', 'descricao')}
-                {temAplicacao && cabecalho('Aplicação')}
                 {temInfo && cabecalho('Info+')}
                 {cabecalho('Marca', 'marca')}
                 {podeEditar && cabecalho('Preço', 'precoVenda', 'right')}
@@ -418,11 +416,6 @@ export const EstoqueView: React.FC<EstoqueViewProps> = ({ usuario, config, ativo
                         {p.descricao}
                       </span>
                     </td>
-                    {temAplicacao && (
-                      <td className={`${td} text-stone-500 max-w-[180px] truncate`} title={p.aplicacao}>
-                        {p.aplicacao}
-                      </td>
-                    )}
                     {temInfo && <td className={`${td} text-stone-500`}>{p.info}</td>}
                     <td className={`${td} text-stone-600 dark:text-stone-300 whitespace-nowrap`}>{p.marca}</td>
                     {podeEditar && <td className={`${td} text-right font-mono whitespace-nowrap`}>{formatDecimal(p.precoVenda)}</td>}

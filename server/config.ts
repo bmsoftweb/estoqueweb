@@ -48,6 +48,8 @@ export const config = {
   get apresentarSimilares() { return simNao(valor('APRESENTAR_SIMILARES'), true); },
   /** Plano usado pela rotina da meia-noite quando o pedido não tem plano */
   get planoPadraoAgendador() { return inteiro(valor('PLANO_PADRAO_AGENDADOR'), 7); },
+  /** Logomarca na impressão do pedido (URL ou caminho em /public); vazio = nome da empresa */
+  get logoUrl() { return String(valor('LOGO_URL') || '').trim(); },
 
   agendadorMeiaNoite: simNao(process.env.AGENDADOR_MEIA_NOITE, false),
   /** Números dos servidores (tabela servidores) em que a rotina da meia-noite roda, ex.: "1,3" */

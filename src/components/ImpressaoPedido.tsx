@@ -64,7 +64,11 @@ const FolhaPedido: React.FC<{ dados: ImpressaoPedido }> = ({ dados }) => {
       {/* Cabeçalho */}
       <div className="flex items-start justify-between gap-6 border-b-2 border-stone-800 pb-3">
         <div>
-          <div className="text-lg font-bold">{empresa?.fantasia || empresa?.nome}</div>
+          {empresa?.logo ? (
+            <img src={empresa.logo} alt={empresa.fantasia || empresa.nome} className="max-h-[22mm] max-w-[70mm] object-contain mb-1" />
+          ) : (
+            <div className="text-lg font-bold">{empresa?.fantasia || empresa?.nome}</div>
+          )}
           <div>{empresa?.nome}</div>
           <div>
             CNPJ {formatCNPJ(empresa?.cnpj || '')}
@@ -91,6 +95,12 @@ const FolhaPedido: React.FC<{ dados: ImpressaoPedido }> = ({ dados }) => {
           <span className="font-semibold">Cliente: </span>
           {cliente?.id} - {cliente?.nome}
         </div>
+        {pedido.usuarioNome && (
+          <div className="col-span-2">
+            <span className="font-semibold">Pedido feito por: </span>
+            {pedido.usuarioNome}
+          </div>
+        )}
         <div>
           <span className="font-semibold">CPF/CNPJ: </span>
           {formatCNPJ(cliente?.cpfcnpj || '')}

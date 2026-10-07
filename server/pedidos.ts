@@ -83,6 +83,7 @@ function mapearPedido(r: Linha) {
     numeroPedido: String(r.numero_pedido ?? '').trim(),
     numeroNf: String(r.numero_nf ?? '').trim(),
     idUsuario: Number(r.id_usuario || 0),
+    usuarioNome: String(r.usuario_nome ?? '').trim(),
     entregaData: r.entrega_data,
     entregaObs: String(r.entrega_obs ?? '').trim(),
     qtdItens: r.qtd_itens === undefined ? undefined : Number(r.qtd_itens || 0),
@@ -95,10 +96,11 @@ const SELECT_PEDIDO = `
          CAST(W.OBS AS VARCHAR(512)) obs, W.TOTAL_PRODUTOS total_produtos, W.PERC_DESCONTOS perc_descontos,
          W.TOTAL_DESCONTOS total_descontos, W.TOTAL_PEDIDO total_pedido, W.STATUS status, W.FATURADO faturado,
          W.NUMERO_PEDIDO numero_pedido, W.NUMERO_NF numero_nf, W.ID_USUARIO id_usuario,
-         W.ENTREGA_DATA entrega_data, W.ENTREGA_OBS entrega_obs
+         W.ENTREGA_DATA entrega_data, W.ENTREGA_OBS entrega_obs, U.NOME_USUARIO usuario_nome
     FROM WEB_PEDIDOS W
     LEFT JOIN PESSOAS P ON P.ID = W.ID_EMPRESA
-    LEFT JOIN PLANOS PL ON PL.ID = W.ID_PLANO`;
+    LEFT JOIN PLANOS PL ON PL.ID = W.ID_PLANO
+    LEFT JOIN WEB_USUARIOS U ON U.ID = W.ID_USUARIO`;
 
 /** Pedido do usuário; lojas (ID_PESSOA > 0) só enxergam os próprios pedidos */
 async function carregarPedido(idPedido: number, usuario: UsuarioSessao) {
@@ -860,6 +862,21 @@ export function createPedidosRouter() {
   router.get('/pedidos/:id/impressao', async (req: Request, res: Response) => {
     try {
       const pedido = await carregarPedido(Number(req.params.id), req.usuario!);
+
+      // O ERP pode renumerar o DAV depois do fechamento: imprime o número atual do ORCAMENTOM
+      if (pedido.status === STATUS_FECHADO) {
+        const dav = await consultarUm(
+          `SELECT NUMERO numero FROM ORCAMENTOM
+            WHERE PEDIDO_VENDEDOR = ${sqlTexto(pedidoVendedor(pedido.id))} AND ID_EMPRESA = ${sqlInteiro(config.idEmpresa)}
+            ORDER BY ID DESC TOP 1`,
+        );
+        const numero = String(dav?.numero ?? '').trim();
+        if (numero && numero !== pedido.numeroPedido) {
+          await executar('UPDATE WEB_PEDIDOS SET NUMERO_PEDIDO = :n WHERE ID = :id', { n: numero, id: pedido.id });
+          pedido.numeroPedido = numero;
+        }
+      }
+
       const itens = await carregarItens(pedido.id);
       const cliente = await dadosCliente(pedido.idCliente);
       const empresa = await consultarUm(
@@ -901,7 +918,7 @@ export function createPedidosRouter() {
         pedido,
         itens,
         cliente: limpar(cliente),
-        empresa: limpar(empresa),
+        empresa: empresa ? { ...limpar(empresa), logo: config.logoUrl } : null,
         plano: plano ? { descricao: String(plano.descricao ?? '').trim(), parcelas: nParcelas } : null,
         parcelas,
       });

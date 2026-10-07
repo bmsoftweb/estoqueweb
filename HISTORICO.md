@@ -2,6 +2,11 @@
 
 Mais recente primeiro. PATCH a cada envio ao GitHub; MAJOR/MINOR só quando pedido.
 
+## 0.0.4 — 2026-10-07
+
+- Consulta de estoque: saiu a coluna Aplicação da grade (a pesquisa por `+aplicação` continua).
+- Impressão do pedido: logomarca no lugar do nome da empresa quando `LOGO_URL` estiver no `servidores.config`; linha "Pedido feito por" com o usuário que criou o pedido; nº do DAV lido do `ORCAMENTOM` na hora de imprimir (corrige o pedido web quando o ERP renumerou o DAV).
+
 ## 0.0.3 — 2026-10-05
 
 - Teste: Cron da rotina da meia-noite movido para 15:00 UTC (12:00 de Brasília). Voltar para `0 3 * * *` depois do teste.

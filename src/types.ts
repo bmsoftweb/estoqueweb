@@ -206,6 +206,7 @@ export interface Pedido {
   numeroPedido: string;
   numeroNf: string;
   idUsuario: number;
+  usuarioNome: string;
   entregaData: string | null;
   entregaObs: string;
 }
