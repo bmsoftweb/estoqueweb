@@ -2,6 +2,10 @@
 
 Mais recente primeiro. PATCH a cada envio ao GitHub; MAJOR/MINOR só quando pedido.
 
+## 0.0.5 — 2026-10-08
+
+- Logomarca da Agro Real em `public/logos/agroreal_logo.png` (usar `LOGO_URL=/logos/agroreal_logo.png` no `servidores.config`).
+
 ## 0.0.4 — 2026-10-07
 
 - Consulta de estoque: saiu a coluna Aplicação da grade (a pesquisa por `+aplicação` continua).
