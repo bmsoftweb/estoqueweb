@@ -2,6 +2,10 @@
 
 Mais recente primeiro. PATCH a cada envio ao GitHub; MAJOR/MINOR só quando pedido.
 
+## 0.0.7 — 2026-10-08
+
+- Vitrine do estoque: fotos num quadro quadrado fixo (foto alta não estica mais o card) e ampliadas proporcionalmente até preencher o quadro.
+
 ## 0.0.6 — 2026-10-08
 
 - Impressão do pedido fechado: corrigido o erro DBISAM 11949 na leitura do nº do DAV (o `ORDER BY ID` exige o `ID` no SELECT).

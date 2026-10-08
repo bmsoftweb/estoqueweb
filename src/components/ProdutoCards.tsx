@@ -41,7 +41,7 @@ export const ProdutoCards: React.FC<ProdutoCardsProps> = ({
           }`}
         >
           {/* Foto */}
-          <div className="relative aspect-square bg-stone-50 dark:bg-stone-950 flex items-center justify-center">
+          <div className="relative aspect-square overflow-hidden bg-stone-50 dark:bg-stone-950 flex items-center justify-center">
             {p.fotoPrincipal ? (
               <Miniatura idFoto={p.fotoPrincipal} alt={p.descricao} />
             ) : (
@@ -161,9 +161,10 @@ const Miniatura: React.FC<{ idFoto: number; alt: string }> = ({ idFoto, alt }) =
   }, [visivel, idFoto]);
 
   return (
-    <div ref={ref} className="w-full h-full flex items-center justify-center p-3">
+    // Absoluto: a foto não estica o quadro; w/h-full + contain amplia as pequenas sem distorcer
+    <div ref={ref} className="absolute inset-0 flex items-center justify-center p-3">
       {url ? (
-        <img src={url} alt={alt} className="max-w-full max-h-full object-contain transition-transform group-hover:scale-105" />
+        <img src={url} alt={alt} className="w-full h-full object-contain transition-transform group-hover:scale-105" />
       ) : falhou ? (
         <ImageOff className="w-8 h-8 text-stone-300" />
       ) : (
