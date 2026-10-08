@@ -2,6 +2,10 @@
 
 Mais recente primeiro. PATCH a cada envio ao GitHub; MAJOR/MINOR só quando pedido.
 
+## 0.0.6 — 2026-10-08
+
+- Impressão do pedido fechado: corrigido o erro DBISAM 11949 na leitura do nº do DAV (o `ORDER BY ID` exige o `ID` no SELECT).
+
 ## 0.0.5 — 2026-10-08
 
 - Logomarca da Agro Real em `public/logos/agroreal_logo.png` (usar `LOGO_URL=/logos/agroreal_logo.png` no `servidores.config`).

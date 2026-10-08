@@ -866,7 +866,7 @@ export function createPedidosRouter() {
       // O ERP pode renumerar o DAV depois do fechamento: imprime o número atual do ORCAMENTOM
       if (pedido.status === STATUS_FECHADO) {
         const dav = await consultarUm(
-          `SELECT NUMERO numero FROM ORCAMENTOM
+          `SELECT ID id, NUMERO numero FROM ORCAMENTOM
             WHERE PEDIDO_VENDEDOR = ${sqlTexto(pedidoVendedor(pedido.id))} AND ID_EMPRESA = ${sqlInteiro(config.idEmpresa)}
             ORDER BY ID DESC TOP 1`,
         );
