@@ -84,7 +84,13 @@ export const FotosProdutoModal: React.FC<{ produto: ProdutoPesquisa; onClose: ()
         <div className="p-4 space-y-3">
           <div className="relative h-[60vh] rounded-xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 flex items-center justify-center overflow-hidden">
             {urls[foto.id] ? (
-              <img src={urls[foto.id]} alt={foto.descricao || produto.descricao} className="max-w-full max-h-full object-contain" />
+              <img
+                src={urls[foto.id]}
+                alt={foto.descricao || produto.descricao}
+                title="Clique 2x para abrir a foto numa aba do navegador"
+                onDoubleClick={() => window.open(urls[foto.id], '_blank')}
+                className="max-w-full max-h-full object-contain cursor-zoom-in"
+              />
             ) : falhas[foto.id] ? (
               <div className="flex flex-col items-center gap-2 text-stone-400 text-xs px-6 text-center">
                 <ImageOff className="w-8 h-8" /> {falhas[foto.id]}

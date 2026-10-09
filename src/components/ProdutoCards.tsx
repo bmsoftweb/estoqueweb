@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Camera, ImageOff, Loader2, Package, Tag } from 'lucide-react';
+import { Camera, Loader2, Tag } from 'lucide-react';
 import { ProdutoPesquisa } from '../types';
 import { miniaturaFoto } from '../services/api';
 import { formatCurrencyBRL, formatQtd } from '../utils/formatters';
@@ -45,7 +45,7 @@ export const ProdutoCards: React.FC<ProdutoCardsProps> = ({
             {p.fotoPrincipal ? (
               <Miniatura idFoto={p.fotoPrincipal} alt={p.descricao} />
             ) : (
-              <Package className="w-12 h-12 text-stone-200 dark:text-stone-700" />
+              <SemImagem />
             )}
 
             {p.fotos > 0 && (
@@ -166,10 +166,16 @@ const Miniatura: React.FC<{ idFoto: number; alt: string }> = ({ idFoto, alt }) =
       {url ? (
         <img src={url} alt={alt} className="w-full h-full object-contain transition-transform group-hover:scale-105" />
       ) : falhou ? (
-        <ImageOff className="w-8 h-8 text-stone-300" />
+        <SemImagem />
       ) : (
         <Loader2 className="w-5 h-5 animate-spin text-stone-300" />
       )}
     </div>
   );
 };
+
+/** Imagem padrão (public/sem_imagem.jpeg) para produto sem foto ou foto que não carregou */
+const SemImagem = () => (
+  // Menor e esmaecida; no tema escuro inverte (fundo escuro, texto cinza claro)
+  <img src="/sem_imagem.jpeg" alt="Sem imagem" className="w-3/5 object-contain mix-blend-multiply opacity-50 dark:invert dark:mix-blend-screen dark:opacity-40" />
+);

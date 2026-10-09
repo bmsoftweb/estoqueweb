@@ -2,6 +2,11 @@
 
 Mais recente primeiro. PATCH a cada envio ao GitHub; MAJOR/MINOR só quando pedido.
 
+## 0.0.8 — 2026-10-09
+
+- Galeria de fotos: clique duplo na foto abre a imagem numa aba do navegador.
+- Vitrine: produto sem foto (ou foto que não carrega) mostra a imagem padrão "Imagem em breve" (`public/sem_imagem.jpeg`), pequena e esmaecida.
+
 ## 0.0.7 — 2026-10-08
 
 - Vitrine do estoque: fotos num quadro quadrado fixo (foto alta não estica mais o card) e ampliadas proporcionalmente até preencher o quadro.
