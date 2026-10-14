@@ -2,6 +2,10 @@
 
 Mais recente primeiro. PATCH a cada envio ao GitHub; MAJOR/MINOR só quando pedido.
 
+## 0.0.10 — 2026-10-14
+
+- Tela de login no modelo do crmWeb: identidade à esquerda (prateleira de estoque ao fundo), formulário à direita com Servidor/E-mail/Senha, toggle "Lembrar" e versão no rodapé (`__APP_VERSION__` lido do `package.json`).
+
 ## 0.0.9 — 2026-10-14
 
 - Painel: card "Pré-pedido" abre o Estoque já em "Meu pré-pedido"; cards "Pedidos abertos", "Pedidos fechados" e "Cancelados no ERP" abrem Pedidos já filtrados (Abertos, Fechados, Cancelados).
