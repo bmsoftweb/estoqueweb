@@ -97,9 +97,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Marca — mesma altura do header da área de trabalho */}
       <div className="h-[var(--altura-topo)] shrink-0 px-4 border-b border-stone-200 dark:border-stone-800/80 flex items-center justify-between gap-3 bg-stone-50/50 dark:bg-transparent">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="h-9 px-3 min-w-11 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-[11px] tracking-widest shadow-md shrink-0">
-            EST
-          </div>
+          {empresa.logo ? (
+            <img src={empresa.logo} alt={empresa.apelido} className="h-9 max-w-20 object-contain shrink-0" />
+          ) : (
+            <div className="h-9 px-3 min-w-11 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-[11px] tracking-widest shadow-md shrink-0">
+              EST
+            </div>
+          )}
           <div className="min-w-0">
             <h1 className="text-sm font-bold text-stone-900 dark:text-white leading-tight truncate">EstoqueWEB</h1>
             <p className="text-[11px] text-stone-500 dark:text-stone-400 truncate">{empresa.apelido}</p>

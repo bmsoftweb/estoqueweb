@@ -231,6 +231,7 @@ async function dadosEmpresa() {
     cnpj: String(e?.cnpj || '').trim(),
     cidade: String(e?.cidade || '').trim(),
     uf: String(e?.uf || '').trim(),
+    logo: config.logoUrl,
   };
 }
 

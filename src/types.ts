@@ -65,6 +65,7 @@ export interface Empresa {
   cnpj: string;
   cidade: string;
   uf: string;
+  logo?: string;
 }
 
 export interface ConfigPublica {

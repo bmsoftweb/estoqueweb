@@ -2,6 +2,10 @@
 
 Mais recente primeiro. PATCH a cada envio ao GitHub; MAJOR/MINOR só quando pedido.
 
+## 0.0.12 — 2026-10-14
+
+- Barra lateral: logomarca da empresa (`LOGO_URL` do `servidores.config`) no lugar do selo azul "EST"; sem logo configurada, continua o "EST".
+
 ## 0.0.11 — 2026-10-14
 
 - Rotina automática (fechamento dos pedidos e exclusão das pré-reservas) de volta à meia-noite: Cron `0 3 * * *` (03:00 UTC = 00:00 de Brasília), fim do teste das 12:00.
