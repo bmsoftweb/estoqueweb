@@ -316,8 +316,8 @@ export default function App() {
             )}
           </main>
         ) : (
-          <main className="flex-1 overflow-y-auto min-h-0 w-full">
-            <div className="px-4 sm:px-6 lg:px-8 py-6">
+          <main className="flex-1 flex flex-col overflow-y-auto min-h-0 w-full">
+            <div className="flex-1 px-4 sm:px-6 lg:px-8 py-6">
               <Dashboard
                 usuario={usuario}
                 empresa={empresa}

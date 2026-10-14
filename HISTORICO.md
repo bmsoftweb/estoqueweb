@@ -2,6 +2,10 @@
 
 Mais recente primeiro. PATCH a cada envio ao GitHub; MAJOR/MINOR só quando pedido.
 
+## 0.0.13 — 2026-10-14
+
+- Painel: rodapé fixo no pé da tela (antes ficava logo abaixo dos cards, deixando espaço vazio embaixo).
+
 ## 0.0.12 — 2026-10-14
 
 - Barra lateral: logomarca da empresa (`LOGO_URL` do `servidores.config`) no lugar do selo azul "EST"; sem logo configurada, continua o "EST".
