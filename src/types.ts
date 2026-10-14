@@ -210,6 +210,8 @@ export interface Pedido {
   usuarioNome: string;
   entregaData: string | null;
   entregaObs: string;
+  recebData: string | null;
+  recebObs: string;
 }
 
 export interface ItemPedido {

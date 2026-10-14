@@ -233,5 +233,7 @@ export const excluirItem = (id: number, itemId: number) => send('DELETE', `/api/
 export const capturarPrePedido = (id: number) =>
   send<{ success: boolean; capturados: number; jaIncluidos: string[] }>('POST', `/api/pedidos/${id}/capturar`);
 export const salvarEntrega = (id: number, data: string, obs: string) => send('PUT', `/api/pedidos/${id}/entrega`, { data, obs });
+export const salvarRecebimento = (id: number, data: string, obs: string) =>
+  send('PUT', `/api/pedidos/${id}/recebimento`, { data, obs });
 export const fecharPedido = (id: number) => send<{ success: boolean; numero: number }>('POST', `/api/pedidos/${id}/fechar`);
 export const fetchImpressao = (id: number) => get<ImpressaoPedido>(`/api/pedidos/${id}/impressao`);

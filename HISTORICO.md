@@ -2,6 +2,11 @@
 
 Mais recente primeiro. PATCH a cada envio ao GitHub; MAJOR/MINOR só quando pedido.
 
+## 0.0.14 — 2026-10-14
+
+- Pedidos: na lista, pedido faturado mostra o nº da nota ao lado do DAV (`DAV xxx • NF xxxx`).
+- Pedidos: botão "Recebimento" (pedidos fechados) para a loja informar data e observação do recebimento (`WEB_PEDIDOS.RECEB_DATA`/`RECEB_OBS`); cabeçalho mostra "Recebido dd/mm/aaaa"; filtros "Recebidos" e "Não recebidos" (fechados com `RECEB_DATA` em branco).
+
 ## 0.0.13 — 2026-10-14
 
 - Painel: rodapé fixo no pé da tela (antes ficava logo abaixo dos cards, deixando espaço vazio embaixo).

@@ -20,6 +20,7 @@ import {
   CheckCircle2,
   ChevronUp,
   ChevronDown,
+  PackageCheck,
 } from 'lucide-react';
 import { ContextoPedidos, ItemPedido, Pedido, PedidoDetalhe, ProdutoPesquisa, Usuario } from '../types';
 import {
@@ -36,6 +37,7 @@ import {
   listarPedidos,
   pesquisarEstoque,
   salvarEntrega,
+  salvarRecebimento,
   sincronizarPedidos,
 } from '../services/api';
 import { INPUT_CLASS, LABEL_CLASS, FIELD_CLASS, HINT_CLASS } from '../utils/formStyles';
@@ -104,6 +106,7 @@ export const PedidosView: React.FC<PedidosViewProps> = ({ usuario, ativo, refres
   const [formPedido, setFormPedido] = useState<'novo' | 'editar' | null>(null);
   const [buscaProduto, setBuscaProduto] = useState(false);
   const [entregaAberta, setEntregaAberta] = useState(false);
+  const [recebimentoAberto, setRecebimentoAberto] = useState(false);
   const [obsItem, setObsItem] = useState<ItemPedido | null>(null);
   const [impressao, setImpressao] = useState<number | null>(null);
   const [confirmacao, setConfirmacao] = useState<Confirmacao | null>(null);
@@ -287,6 +290,8 @@ export const PedidosView: React.FC<PedidosViewProps> = ({ usuario, ativo, refres
             <option value="A">Abertos</option>
             <option value="F">Fechados</option>
             <option value="faturado">Faturados</option>
+            <option value="recebido">Recebidos</option>
+            <option value="naoRecebido">Não recebidos</option>
             <option value="X">Cancelados</option>
           </select>
           <button
@@ -346,7 +351,12 @@ export const PedidosView: React.FC<PedidosViewProps> = ({ usuario, ativo, refres
                           {p.descricao && ` • ${p.descricao}`}
                           {usuario.idPessoa === 0 && p.clienteNome && ` • ${p.clienteNome}`}
                         </span>
-                        {p.numeroPedido && <span className="shrink-0 font-mono">DAV {p.numeroPedido}</span>}
+                        {p.numeroPedido && (
+                          <span className="shrink-0 font-mono">
+                            DAV {p.numeroPedido}
+                            {p.faturado && p.numeroNf && ` • NF ${p.numeroNf.split('/').pop()}`}
+                          </span>
+                        )}
                       </div>
                     </button>
                   </li>
@@ -415,6 +425,12 @@ export const PedidosView: React.FC<PedidosViewProps> = ({ usuario, ativo, refres
                         {detalhe.entregaObs && ` • ${detalhe.entregaObs}`}
                       </span>
                     )}
+                    {detalhe.recebData && (
+                      <span className="text-emerald-700 dark:text-emerald-400">
+                        Recebido {formatDateBR(detalhe.recebData)}
+                        {detalhe.recebObs && ` • ${detalhe.recebObs}`}
+                      </span>
+                    )}
                   </div>
                   {detalhe.obs && <p className="text-[11px] text-stone-500 mt-1 whitespace-pre-line">Obs.: {detalhe.obs}</p>}
                 </div>
@@ -446,6 +462,11 @@ export const PedidosView: React.FC<PedidosViewProps> = ({ usuario, ativo, refres
                       <Truck className="w-3.5 h-3.5" /> Entrega
                     </button>
                   </>
+                )}
+                {detalhe.status === 'F' && (
+                  <button onClick={() => setRecebimentoAberto(true)} disabled={ocupado} className={BOTAO_SECUNDARIO}>
+                    <PackageCheck className="w-3.5 h-3.5" /> Recebimento
+                  </button>
                 )}
                 <button onClick={() => setImpressao(detalhe.id)} className={BOTAO_SECUNDARIO}>
                   <Printer className="w-3.5 h-3.5" /> Imprimir
@@ -637,6 +658,18 @@ export const PedidosView: React.FC<PedidosViewProps> = ({ usuario, ativo, refres
             setEntregaAberta(false);
             onToast('Entrega registrada.');
             await carregarDetalhe(detalhe.id);
+          }}
+        />
+      )}
+
+      {recebimentoAberto && detalhe && (
+        <RecebimentoModal
+          pedido={detalhe}
+          onClose={() => setRecebimentoAberto(false)}
+          onSalvo={async () => {
+            setRecebimentoAberto(false);
+            onToast('Recebimento registrado.');
+            await recarregarTudo();
           }}
         />
       )}
@@ -1082,6 +1115,64 @@ const EntregaModal: React.FC<{ pedido: Pedido; onClose: () => void; onSalvo: () 
           <label className={LABEL_CLASS}>Observação da entrega</label>
           <input value={obs} maxLength={80} onChange={(e) => setObs(e.target.value)} className={`${INPUT_CLASS} w-full`} />
           <p className={HINT_CLASS}>Vai no texto de cada item do DAV ao fechar o pedido.</p>
+        </div>
+        <div className="flex justify-end gap-2.5">
+          <button type="button" onClick={onClose} disabled={salvando} className={BOTAO_SECUNDARIO}>
+            Cancelar
+          </button>
+          <button type="submit" disabled={salvando} className={BOTAO_PRIMARIO}>
+            {salvando && <Loader2 className="w-3.5 h-3.5 animate-spin" />} Confirmar
+          </button>
+        </div>
+      </form>
+    </Modal>
+  );
+};
+
+const RecebimentoModal: React.FC<{ pedido: Pedido; onClose: () => void; onSalvo: () => void }> = ({ pedido, onClose, onSalvo }) => {
+  const [data, setData] = useState(pedido.recebData ? String(pedido.recebData).slice(0, 10) : hojeISO());
+  const [obs, setObs] = useState(pedido.recebObs);
+  const [salvando, setSalvando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
+
+  const salvar = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!data || data > hojeISO()) {
+      setErro('Data inválida! O recebimento não pode ser posterior a hoje.');
+      return;
+    }
+    setSalvando(true);
+    setErro(null);
+    try {
+      await salvarRecebimento(pedido.id, data, obs);
+      onSalvo();
+    } catch (err: any) {
+      setErro(err.message);
+    } finally {
+      setSalvando(false);
+    }
+  };
+
+  return (
+    <Modal titulo={`Recebimento do pedido #${pedido.id}`} onClose={onClose} largura="sm" bloqueado={salvando}>
+      <form onSubmit={salvar} className="p-5 space-y-4">
+        {erro && <MensagemErro texto={erro} />}
+        <div className={FIELD_CLASS}>
+          <label className={LABEL_CLASS}>
+            Data do recebimento <span className="text-rose-500">*</span>
+          </label>
+          <DateField value={data} onChange={setData} required className={`${INPUT_CLASS} w-full`} />
+        </div>
+        <div className={FIELD_CLASS}>
+          <label className={LABEL_CLASS}>Observação do recebimento</label>
+          <textarea
+            value={obs}
+            autoFocus
+            maxLength={255}
+            rows={3}
+            onChange={(e) => setObs(e.target.value)}
+            className={`${INPUT_CLASS} w-full resize-none`}
+          />
         </div>
         <div className="flex justify-end gap-2.5">
           <button type="button" onClick={onClose} disabled={salvando} className={BOTAO_SECUNDARIO}>

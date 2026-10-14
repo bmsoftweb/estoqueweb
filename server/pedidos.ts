@@ -86,6 +86,8 @@ function mapearPedido(r: Linha) {
     usuarioNome: String(r.usuario_nome ?? '').trim(),
     entregaData: r.entrega_data,
     entregaObs: String(r.entrega_obs ?? '').trim(),
+    recebData: r.receb_data,
+    recebObs: String(r.receb_obs ?? '').trim(),
     qtdItens: r.qtd_itens === undefined ? undefined : Number(r.qtd_itens || 0),
   };
 }
@@ -96,7 +98,8 @@ const SELECT_PEDIDO = `
          CAST(W.OBS AS VARCHAR(512)) obs, W.TOTAL_PRODUTOS total_produtos, W.PERC_DESCONTOS perc_descontos,
          W.TOTAL_DESCONTOS total_descontos, W.TOTAL_PEDIDO total_pedido, W.STATUS status, W.FATURADO faturado,
          W.NUMERO_PEDIDO numero_pedido, W.NUMERO_NF numero_nf, W.ID_USUARIO id_usuario,
-         W.ENTREGA_DATA entrega_data, W.ENTREGA_OBS entrega_obs, U.NOME_USUARIO usuario_nome
+         W.ENTREGA_DATA entrega_data, W.ENTREGA_OBS entrega_obs,
+         W.RECEB_DATA receb_data, W.RECEB_OBS receb_obs, U.NOME_USUARIO usuario_nome
     FROM WEB_PEDIDOS W
     LEFT JOIN PESSOAS P ON P.ID = W.ID_EMPRESA
     LEFT JOIN PLANOS PL ON PL.ID = W.ID_PLANO
@@ -525,6 +528,9 @@ export function createPedidosRouter() {
       if (u.idPessoa > 0) where.push(`W.ID_EMPRESA = ${sqlInteiro(u.idPessoa)}`);
       if (['A', 'F', 'X'].includes(status)) where.push(`W.STATUS = ${sqlTexto(status)}`);
       if (status === 'faturado') where.push(`W.FATURADO = 'S'`);
+      // Sem RECEB_DATA = ainda não recebido pela loja
+      if (status === 'recebido') where.push(`W.RECEB_DATA IS NOT NULL`);
+      if (status === 'naoRecebido') where.push(`W.STATUS = 'F' AND W.RECEB_DATA IS NULL`);
       if (busca) {
         const n = /^\d{1,9}$/.test(busca) ? Number(busca) : -1;
         where.push(
@@ -838,6 +844,26 @@ export function createPedidosRouter() {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(data) || data < hojeISO()) throw new BmapiError('Data inválida!');
 
       await executar('UPDATE WEB_PEDIDOS SET ENTREGA_DATA = :d, ENTREGA_OBS = :o WHERE ID = :id', {
+        d: data,
+        o: obs,
+        id: pedido.id,
+      });
+      res.json({ success: true });
+    } catch (err) {
+      erro(res, err);
+    }
+  });
+
+  router.put('/pedidos/:id/recebimento', async (req: Request, res: Response) => {
+    try {
+      const pedido = await carregarPedido(Number(req.params.id), req.usuario!);
+      if (pedido.status !== STATUS_FECHADO) throw new BmapiError('Só é possível registrar o recebimento de pedido fechado.');
+
+      const data = String(req.body?.data || '').slice(0, 10);
+      const obs = String(req.body?.obs || '').slice(0, 255);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(data) || data > hojeISO()) throw new BmapiError('Data inválida!');
+
+      await executar('UPDATE WEB_PEDIDOS SET RECEB_DATA = :d, RECEB_OBS = :o WHERE ID = :id', {
         d: data,
         o: obs,
         id: pedido.id,
