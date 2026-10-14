@@ -2,6 +2,10 @@
 
 Mais recente primeiro. PATCH a cada envio ao GitHub; MAJOR/MINOR só quando pedido.
 
+## 0.0.11 — 2026-10-14
+
+- Rotina automática (fechamento dos pedidos e exclusão das pré-reservas) de volta à meia-noite: Cron `0 3 * * *` (03:00 UTC = 00:00 de Brasília), fim do teste das 12:00.
+
 ## 0.0.10 — 2026-10-14
 
 - Tela de login no modelo do crmWeb: identidade à esquerda (prateleira de estoque ao fundo), formulário à direita com Servidor/E-mail/Senha, toggle "Lembrar" e versão no rodapé (`__APP_VERSION__` lido do `package.json`).
