@@ -58,6 +58,8 @@ interface PedidosViewProps {
   ativo: boolean;
   refreshToken: number;
   createToken: number;
+  /** Filtro de status pedido por um card do painel (n muda a cada clique) */
+  filtroStatus: { valor: string; n: number } | null;
   onToast: (msg: string) => void;
   onPrePedidoAlterado: () => void;
 }
@@ -81,13 +83,13 @@ export const BadgeStatus: React.FC<{ status: string; faturado?: boolean }> = ({ 
   );
 };
 
-export const PedidosView: React.FC<PedidosViewProps> = ({ usuario, ativo, refreshToken, createToken, onToast, onPrePedidoAlterado }) => {
+export const PedidosView: React.FC<PedidosViewProps> = ({ usuario, ativo, refreshToken, createToken, filtroStatus, onToast, onPrePedidoAlterado }) => {
   const [contexto, setContexto] = useState<ContextoPedidos | null>(null);
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useState(filtroStatus?.valor ?? '');
   const [busca, setBusca] = useState('');
   const [buscaInput, setBuscaInput] = useState('');
   const [carregandoLista, setCarregandoLista] = useState(true);
@@ -188,6 +190,15 @@ export const PedidosView: React.FC<PedidosViewProps> = ({ usuario, ativo, refres
   useEffect(() => {
     if (createToken > 0 && ativo) setFormPedido('novo');
   }, [createToken]);
+
+  useEffect(() => {
+    if (!filtroStatus) return;
+    setPage(1);
+    setStatus(filtroStatus.valor);
+    // O pedido selecionado pode não estar no filtro: a lista escolhe o primeiro
+    if (filtroStatus.valor !== status) setIdSelecionado(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtroStatus?.n]);
 
   const recarregarTudo = async (id: number | null = idSelecionado) => {
     await Promise.all([carregarLista(), carregarDetalhe(id)]);

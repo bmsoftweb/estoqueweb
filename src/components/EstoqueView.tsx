@@ -41,6 +41,8 @@ interface EstoqueViewProps {
   /** false enquanto a tela está escondida por trás de outra (mantém a última consulta) */
   ativo: boolean;
   refreshToken: number;
+  /** Muda a cada clique no card "Pré-pedido" do painel */
+  prePedidoToken: number;
   onToast: (msg: string) => void;
   /** Avisa o App que o pré-pedido mudou (contador da sidebar) */
   onPrePedidoAlterado: () => void;
@@ -77,7 +79,7 @@ function salvarUltimaPesquisa(texto: string) {
   }
 }
 
-export const EstoqueView: React.FC<EstoqueViewProps> = ({ usuario, config, ativo, refreshToken, onToast, onPrePedidoAlterado }) => {
+export const EstoqueView: React.FC<EstoqueViewProps> = ({ usuario, config, ativo, refreshToken, prePedidoToken, onToast, onPrePedidoAlterado }) => {
   const podeEditar = usuario.nivel === 'A' || usuario.nivel === 'G' || usuario.nivel === 'S';
   const podePromocao = podeEditar && usuario.listaPreco === '1';
 
@@ -148,6 +150,21 @@ export const EstoqueView: React.FC<EstoqueViewProps> = ({ usuario, config, ativo
     if (refreshToken > 0 && produtos && ativo) pesquisar();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshToken]);
+
+  // Card "Pré-pedido" do painel: o mesmo que clicar em "Meu pré-pedido" (depois do recálculo ao abrir)
+  const prePedidoFeito = useRef(0);
+  useEffect(() => {
+    if (prePedidoToken > prePedidoFeito.current && !recalculando) {
+      prePedidoFeito.current = prePedidoToken;
+      verPrePedido();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prePedidoToken, recalculando]);
+
+  const verPrePedido = () => {
+    setTexto('*');
+    pesquisar('*', 'todos');
+  };
 
   const linhas = useMemo(() => {
     if (!produtos) return [];
@@ -243,10 +260,7 @@ export const EstoqueView: React.FC<EstoqueViewProps> = ({ usuario, config, ativo
         </button>
 
         <button
-          onClick={() => {
-            setTexto('*');
-            pesquisar('*', 'todos');
-          }}
+          onClick={verPrePedido}
           className={BOTAO_SECUNDARIO}
           title="Somente os produtos que você colocou no pré-pedido"
         >

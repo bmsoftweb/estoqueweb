@@ -74,6 +74,7 @@ export default function App() {
 
   const [refreshToken, setRefreshToken] = useState(0);
   const [createToken, setCreateToken] = useState(0);
+  const [atalho, setAtalho] = useState<{ tab: string; valor: string; n: number }>({ tab: '', valor: '', n: 0 });
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = useCallback((msg: string) => {
@@ -220,6 +221,12 @@ export default function App() {
     setActiveTab(tab);
   };
 
+  /** Cards do painel: abre a tela já com a ação/filtro (n muda a cada clique para repetir o mesmo atalho) */
+  const abrirAtalho = (tab: string, valor?: string) => {
+    if (valor !== undefined) setAtalho((a) => ({ tab, valor, n: a.n + 1 }));
+    trocarTela(tab);
+  };
+
   return (
     <div className="h-screen overflow-hidden bg-stone-100/70 dark:bg-stone-950 text-stone-900 dark:text-stone-100 flex font-sans antialiased selection:bg-blue-600 selection:text-white">
       {toastMessage && (
@@ -267,6 +274,7 @@ export default function App() {
               config={config}
               ativo={estoqueAtivo}
               refreshToken={refreshToken}
+              prePedidoToken={atalho.tab === 'estoque' ? atalho.n : 0}
               onToast={showToast}
               onPrePedidoAlterado={atualizarPrePedido}
             />
@@ -280,6 +288,7 @@ export default function App() {
               ativo={pedidosAtivo}
               refreshToken={refreshToken}
               createToken={createToken}
+              filtroStatus={atalho.tab === 'pedidos' ? atalho : null}
               onToast={showToast}
               onPrePedidoAlterado={atualizarPrePedido}
             />
@@ -316,7 +325,7 @@ export default function App() {
                 dbStatus={dbStatus}
                 isLoading={isDashboardLoading}
                 error={dashboardError}
-                onNavigate={trocarTela}
+                onNavigate={abrirAtalho}
               />
             </div>
 

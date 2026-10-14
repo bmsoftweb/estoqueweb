@@ -24,7 +24,7 @@ interface DashboardProps {
   dbStatus: DbConnectionStatus | null;
   isLoading: boolean;
   error: string | null;
-  onNavigate: (tab: string) => void;
+  onNavigate: (tab: string, filtro?: string) => void;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ usuario, empresa, data, dbStatus, isLoading, error, onNavigate }) => {
@@ -57,6 +57,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ usuario, empresa, data, db
   const kpis = [
     {
       tab: 'estoque',
+      filtro: 'prePedido',
       label: 'Pré-pedido',
       value: formatNumberBR(data.prePedido.itens),
       detail: `${formatQtd(data.prePedido.qtdade)} unidade(s) reservada(s)`,
@@ -68,6 +69,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ usuario, empresa, data, db
     },
     {
       tab: 'pedidos',
+      filtro: 'A',
       label: 'Pedidos abertos',
       value: formatNumberBR(abertos.quantidade),
       detail: formatCurrencyBRL(abertos.valor),
@@ -79,6 +81,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ usuario, empresa, data, db
     },
     {
       tab: 'pedidos',
+      filtro: 'F',
       label: 'Pedidos fechados',
       value: formatNumberBR(fechados.quantidade),
       detail: `${formatNumberBR(data.faturados)} faturado(s) • ${formatCurrencyBRL(fechados.valor)}`,
@@ -90,6 +93,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ usuario, empresa, data, db
     },
     {
       tab: 'pedidos',
+      filtro: 'X',
       label: 'Cancelados no ERP',
       value: formatNumberBR(cancelados.quantidade),
       detail: 'Pedidos com DAV cancelado',
@@ -153,7 +157,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ usuario, empresa, data, db
           return (
             <button
               key={kpi.label}
-              onClick={() => onNavigate(kpi.tab)}
+              onClick={() => onNavigate(kpi.tab, kpi.filtro)}
               className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-4 shadow-xs text-left hover:border-blue-300 dark:hover:border-blue-800 hover:shadow-md transition-all cursor-pointer group"
             >
               <div className="flex items-start justify-between gap-3">

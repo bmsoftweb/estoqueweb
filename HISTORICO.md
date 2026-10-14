@@ -2,6 +2,10 @@
 
 Mais recente primeiro. PATCH a cada envio ao GitHub; MAJOR/MINOR só quando pedido.
 
+## 0.0.9 — 2026-10-14
+
+- Painel: card "Pré-pedido" abre o Estoque já em "Meu pré-pedido"; cards "Pedidos abertos", "Pedidos fechados" e "Cancelados no ERP" abrem Pedidos já filtrados (Abertos, Fechados, Cancelados).
+
 ## 0.0.8 — 2026-10-09
 
 - Galeria de fotos: clique duplo na foto abre a imagem numa aba do navegador.
