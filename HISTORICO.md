@@ -2,6 +2,10 @@
 
 Mais recente primeiro. PATCH a cada envio ao GitHub; MAJOR/MINOR só quando pedido.
 
+## 0.0.15 — 2026-10-16
+
+- Pesquisa de produtos: nova chave `NAO_MOSTRAR_PRODUTOS_CLASSIF` no `servidores.config` (ex.: `G,J,H`); produtos com essas letras em `PRODUTOSPRINCIPAL.CLASSIFICACAO` não aparecem na lista, em qualquer filtro.
+
 ## 0.0.14 — 2026-10-14
 
 - Pedidos: na lista, pedido faturado mostra o nº da nota ao lado do DAV (`DAV xxx • NF xxxx`).

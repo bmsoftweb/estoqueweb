@@ -50,6 +50,13 @@ export const config = {
   get planoPadraoAgendador() { return inteiro(valor('PLANO_PADRAO_AGENDADOR'), 7); },
   /** Logomarca na impressão do pedido (URL ou caminho em /public); vazio = nome da empresa */
   get logoUrl() { return String(valor('LOGO_URL') || '').trim(); },
+  /** Letras de PRODUTOSPRINCIPAL.CLASSIFICACAO que somem da pesquisa, ex.: "G,J,H" */
+  get naoMostrarProdutosClassif() {
+    return String(valor('NAO_MOSTRAR_PRODUTOS_CLASSIF') || '')
+      .split(',')
+      .map((s) => s.trim().toUpperCase())
+      .filter(Boolean);
+  },
 
   agendadorMeiaNoite: simNao(process.env.AGENDADOR_MEIA_NOITE, false),
   /** Números dos servidores (tabela servidores) em que a rotina da meia-noite roda, ex.: "1,3" */

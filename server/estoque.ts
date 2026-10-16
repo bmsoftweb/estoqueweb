@@ -116,6 +116,7 @@ async function pesquisarProdutos(
     : 'TRUE';
 
   const infoComplementar = await baseTemInfoComplementar();
+  const classifOcultas = config.naoMostrarProdutosClassif;
 
   const filtroReferencia = p
     ? (await filtroPorIds(`SELECT ID_PRODUTO id FROM PRODUTOSREFERENCIA WHERE UPPER(REFERENCIA) LIKE ${padrao}`)) ??
@@ -168,6 +169,7 @@ async function pesquisarProdutos(
        AND (${sqlFiltroEstoque(filtroEstoque)})
        AND (${filtroIdsEstoque ?? 'TRUE'})
        AND A.ATIVO = 'S'
+       ${classifOcultas.length ? `AND UPPER(COALESCE(A.CLASSIFICACAO,'')) NOT IN (${classifOcultas.map((c) => sqlTexto(c)).join(',')})` : ''}
      ORDER BY A.DESCRICAO
      TOP ${LIMITE_PESQUISA}`;
 
