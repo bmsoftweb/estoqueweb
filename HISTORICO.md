@@ -2,6 +2,10 @@
 
 Mais recente primeiro. PATCH a cada envio ao GitHub; MAJOR/MINOR só quando pedido.
 
+## 0.0.16 — 2026-10-16
+
+- Pesquisa de produtos: `NAO_MOSTRAR_PRODUTOS_CLASSIF` passa a comparar com `PRODUTOSPRINCIPAL.TIPO` (na 0.0.15 usava `CLASSIFICACAO` por engano).
+
 ## 0.0.15 — 2026-10-16
 
 - Pesquisa de produtos: nova chave `NAO_MOSTRAR_PRODUTOS_CLASSIF` no `servidores.config` (ex.: `G,J,H`); produtos com essas letras em `PRODUTOSPRINCIPAL.CLASSIFICACAO` não aparecem na lista, em qualquer filtro.

@@ -169,7 +169,7 @@ async function pesquisarProdutos(
        AND (${sqlFiltroEstoque(filtroEstoque)})
        AND (${filtroIdsEstoque ?? 'TRUE'})
        AND A.ATIVO = 'S'
-       ${classifOcultas.length ? `AND UPPER(COALESCE(A.CLASSIFICACAO,'')) NOT IN (${classifOcultas.map((c) => sqlTexto(c)).join(',')})` : ''}
+       ${classifOcultas.length ? `AND UPPER(COALESCE(A.TIPO,'')) NOT IN (${classifOcultas.map((c) => sqlTexto(c)).join(',')})` : ''}
      ORDER BY A.DESCRICAO
      TOP ${LIMITE_PESQUISA}`;
 
